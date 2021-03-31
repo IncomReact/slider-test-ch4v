@@ -1,13 +1,13 @@
 (function($) {
     let data = [
         {
-            featured: true,
+            featured: false,
             id:"1",
             titre:"slide 1",
             img:"bg.jpg"  
         },
         {
-            featured: false,
+            featured: true,
             id:"2",
             titre:"slide 2",
             img:"bg.jpg"   
@@ -94,142 +94,72 @@
     function slideNext() {
 
         counter++;
+        if (counter >= data.length)
+            counter = 0;
        
         // Get height of the first article
         let articleHeight = $(".list-slides .article").filter(':first').height();
-         
-        console.log("counter next", counter)
-      
-
-        if(counter < data.length  ) {
-
-            // Featured Article
-            $(".main-slide .main-article").remove()
-            $(".main-slide").append("<div class='main-article'><h1>" + data[counter].titre + "</h1><img src=" + data[counter].img + "></div>")
-            $(".main-slide .main-article").animate({
-                opacity: 1
-            }, transitionFeaturedTime);
-            
-            // List Articles
-            $(".article").filter(':first').addClass("fooooo")
-            .animate({
-                marginTop: "-" + articleHeight,
-            }, {
-                    duration: transitionListArticlesTime,
-                    start: function(){
-                        // Attach article to the end of the list
-                        $(".list-slides").append("<div class='article'><h1>" + data[counter-1].titre + "</h1><img src=" + data[counter-1].img + "></div>")
-                    }, 
-                    complete: function(){
-                        // Detach article from Dom
-                        $(this).detach();
-                    } 
-                }  
-            );
-
-        } else {
-
-            console.log("else")
-            
-            counter = 0
-
-            // Featured Article
-            $(".main-slide .main-article").remove()
-            $(".main-slide").append("<div class='main-article'><h1>" + data[counter].titre + "</h1><img src=" + data[counter].img + "></div>")
-            $(".main-slide .main-article").animate({
-                opacity: 1
-            }, transitionFeaturedTime);
-
-            // List Articles
-            $(".article").filter(':first').addClass("fooooo")
-            .animate({
-                marginTop: "-" + articleHeight
-            },
-                {
-                    duration : transitionListArticlesTime,
-                    start : function() {
-                        // Attach article to the end of the list
-                        $(".list-slides").append("<div class='article'><h1>" + data[lastArticleIndex].titre + "</h1><img src=" + data[lastArticleIndex].img + "></div>")
-                    },
-                    complete : function(){
-                        // Detach article from Dom
-                        $(this).detach();
-                        
-                    }  
-                }
-            
-            );
-        }
+        
+        // Featured Article
+        $(".main-slide .main-article").remove()
+        $(".main-slide").append("<div class='main-article'><h1>" + data[counter].titre + "</h1><img src=" + data[counter].img + "></div>")
+        $(".main-slide .main-article").animate({
+            opacity: 1
+        }, transitionFeaturedTime);
+        
+        // List Articles
+        $(".article").filter(':first').addClass("fooooo")
+        .animate({
+            marginTop: "-" + articleHeight,
+        }, {
+                duration: transitionListArticlesTime,
+                start: function(){
+                    // Attach article to the end of the list
+                    $(".list-slides").append("<div class='article'><h1>" + data[counter-1].titre + "</h1><img src=" + data[counter-1].img + "></div>")
+                }, 
+                complete: function(){
+                    // Detach article from Dom
+                    $(this).detach();
+                } 
+            }  
+        );
        
     }
 
     // Go Previous Slide
     function slidePrevious() {
 
-        counter--; 
+        counter--;
+        if (counter < 0)
+            counter = lastArticleIndex
        
         // Get height of the first article
         let articleHeight = $(".list-slides .article").filter(':first').height();
 
-        if(counter >= 0) {
+        // Featured Article
+        $(".main-slide .main-article").remove()
+        $(".main-slide").append("<div class='main-article'><h1>" + data[counter].titre + "</h1><img src=" + data[counter].img + "></div>")
+        $(".main-slide .main-article").animate({
+            opacity: 1
+        }, transitionFeaturedTime);
 
-            // Featured Article
-            $(".main-slide .main-article").remove()
-            $(".main-slide").append("<div class='main-article'><h1>" + data[counter].titre + "</h1><img src=" + data[counter].img + "></div>")
-            $(".main-slide .main-article").animate({
-                opacity: 1
-            }, transitionFeaturedTime);
-            
-            // List Articles
-            $(".article").filter(':first').addClass("fooooo")
-            .animate({
-                marginTop: "+" + articleHeight
-            },transitionListArticlesTime,
+        // Find correct index for the slide to prepend to the slides list
+        let previousSlideIndex = counter == lastArticleIndex ? 0 : counter + 1
+                
+        // First we preprend the new article at the top of the list ...
+        $(".list-slides").prepend("<div class='article'><h1>" 
+            + data[previousSlideIndex].titre + "</h1><img src=" 
+            + data[previousSlideIndex].img + "></div>")
 
-                // Callback when anim is complete
-                function(){
+        // ... and we hide it by using a negative margin-top
+        $(".article").filter(':first').css('margin-top', '-' + articleHeight + 'px')
 
-                    $(this).css("margin-top", "0px")
+        // The we detach the old article from the list (since it's now featured)
+        $(".article").filter(':last').detach();
 
-                    // Detach article from Dom
-                    $(".article").filter(':last').detach();
-                    
-                    // Attach article to the start of the list
-                    $(".list-slides").prepend("<div class='article'><h1>" + data[counter + 1].titre + "</h1><img src=" + data[counter + 1].img + "></div>")
-                }    
-            );
-
-        } else {
-
-            counter = lastArticleIndex;
-           
-            // Featured Article
-            $(".main-slide .main-article").remove()
-            $(".main-slide").append("<div class='main-article'><h1>" + data[counter].titre + "</h1><img src=" + data[counter].img + "></div>")
-            $(".main-slide .main-article").animate({
-                opacity: 1
-            }, transitionFeaturedTime);
-
-             // List Articles
-             $(".article").filter(':first').addClass("fooooo")
-             .animate({
-                 marginTop: "+" + articleHeight
-             },transitionListArticlesTime,
- 
-                 // Callback when anim is complete
-                 function(){
-
-                    $(this).css("margin-top", "0px")
- 
-                    // Detach last article from Dom
-                    $(".article").filter(':last').detach();
-                     
-                    // Attach article to the start of the list
-                    $(".list-slides").prepend("<div class='article'><h1>" + data[0].titre + "</h1><img src=" + data[0].img + "></div>")
-                 }    
-             );
-
-        }
+        // Finally we animate the margin-top of the new article to make it appear
+        $(".article").filter(':first').addClass("fooooo")
+        .animate({ marginTop: 0 }, transitionListArticlesTime );
     }
 
     // Trigger click Next
